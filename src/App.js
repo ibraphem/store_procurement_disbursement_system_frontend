@@ -1,25 +1,29 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import Header from "./components/layouts/Header";
+import NavBar from "./components/layouts/NavBar";
+import { Route, Switch, withRouter, useHistory } from "react-router-dom";
+import Dashboard from "./components/Dashboard";
+import Department from "./components/departments/Department";
+import Supplier from "./components/suppliers/Supplier";
+import Item from "./components/items/Item";
+import PurchaseForm from "./components/purchases/PurchaseForm";
+import Purchase from "./components/purchases/Purchase";
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Switch>
+      <>
+        <Header />
+        <NavBar />
+        <Route exact path="/" component={Dashboard} />
+        <Route exact path="/departments" component={Department} />
+        <Route exact path="/suppliers" component={Supplier} />
+        <Route exact path="/items" component={Item} />
+        <Route exact path="/purchases" component={Purchase} />
+        <Route exact path="/purchaseform" component={PurchaseForm} />
+      </>
+    </Switch>
   );
-}
+};
 
 export default App;
