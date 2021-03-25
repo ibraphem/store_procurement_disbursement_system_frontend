@@ -20,9 +20,14 @@ import AddIcon from "@material-ui/icons/Add";
 import { useHistory } from "react-router-dom";
 import SuccessAlerts from "../layouts/alerts/SuccessAlerts";
 import ErrorAlerts from "../layouts/alerts/ErrorAlerts";
+import { useParams } from "react-router-dom";
+import moment from "moment";
+import PurchaseItems from "./PurchaseItems";
 
 const Purchase = () => {
   const history = useHistory();
+  let params = useParams();
+  let { company } = params;
   const tableIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
     Check: forwardRef((props, ref) => <Check {...props} ref={ref} />),
@@ -59,7 +64,7 @@ const Purchase = () => {
   useEffect(() => {
     setIsLoading(true);
     axios
-      .get("http://127.0.0.1:8000/api/purchase")
+      .get(`http://127.0.0.1:8000/api/procurement/${company}`)
       .then((response) => {
         setPurchases(response.data);
         setIsLoading(false);
@@ -67,19 +72,74 @@ const Purchase = () => {
       .catch((err) => {
         console.log(err);
       });
-  }, []);
+  }, [company]);
 
   const redirectToPurchaseForm = () => {
-    history.push("/purchaseform");
+    history.push(`/form/Procurement/${company}`);
+  };
+
+  const formatDate = (date) => {
+    return moment(date).format("MMM DD YYYY");
   };
 
   const columns = [
     {
+      title: "PURCHASE DATE",
+      field: "purchase_date",
+      type: "date",
+      render: (row) => <span> {formatDate(row["purchase_date"])}</span>,
+    },
+    {
       title: "PURCHASE ID",
-      field: "id",
-      render: (row) => <span>LO/OLA/PUR00{row["id"]}</span>,
+      field: "purchase_id",
+      editable: "never",
+      render: (row) => <span>PUR - {row["purchase_id"]}</span>,
     },
   ];
+
+  const handleRowUpdate = (newData, oldData, resolve) => {
+    let procurement_date = new Date(newData.purchase_date)
+      .toISOString()
+      .slice(0, 10);
+
+    console.log(newData.purchase_date);
+    let errorList = [];
+    if (newData.purchase_date === "" || newData.purchase_date === null) {
+      errorList.push("Purchase date can't be empty   ");
+      setIserror(true);
+    }
+
+    if (errorList.length < 1) {
+      axios
+        .post(
+          `http://127.0.0.1:8000/api/procurementDate/update/${oldData.purchase_id}/${company}/${procurement_date}`
+        )
+        .then((response) => {
+          if (response.data === 59) {
+            setAlertMessage([
+              `OOPs, a purchase has already been made on this day for ${company}. You may edit to this purchase`,
+            ]);
+            setIserror(true);
+            resolve();
+          } else {
+            setPurchases(response.data);
+            setAlertMessage(["Purchase Date Updated Successfully  "]);
+            setIserror(false);
+            resolve();
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          setAlertMessage(["Oops, something went wrong!!!   "]);
+          setIserror(true);
+          resolve();
+        });
+    } else {
+      setAlertMessage(errorList);
+      setIserror(true);
+      resolve();
+    }
+  };
 
   return (
     <div className="content-wrapper">
@@ -88,7 +148,7 @@ const Purchase = () => {
         <div className="container-fluid">
           <div className="row mb-2">
             <div className="col-sm-6">
-              <h1>Purchases</h1>
+              <h1>{company} Purchases</h1>
             </div>
           </div>
         </div>
@@ -120,6 +180,20 @@ const Purchase = () => {
                       color: "#FFF",
                     },
                   }}
+                  detailPanel={[
+                    {
+                      tooltip: "Show Participants",
+                      render: (rowData) => {
+                        return (
+                          <PurchaseItems
+                            purchase_id={rowData.purchase_id}
+                            company={company}
+                            purchase_date={rowData.purchase_date}
+                          />
+                        );
+                      },
+                    },
+                  ]}
                   actions={[
                     {
                       icon: () => <AddIcon />,

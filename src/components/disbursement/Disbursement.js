@@ -16,10 +16,18 @@ import Remove from "@material-ui/icons/Remove";
 import SaveAlt from "@material-ui/icons/SaveAlt";
 import Search from "@material-ui/icons/Search";
 import ViewColumn from "@material-ui/icons/ViewColumn";
+import AddIcon from "@material-ui/icons/Add";
+import { useHistory } from "react-router-dom";
 import SuccessAlerts from "../layouts/alerts/SuccessAlerts";
 import ErrorAlerts from "../layouts/alerts/ErrorAlerts";
+import { useParams } from "react-router-dom";
+import moment from "moment";
+import DisbursedItems from "./DisbursedItems";
 
-const Supplier = () => {
+const Disbursement = () => {
+  const history = useHistory();
+  let params = useParams();
+  let { company } = params;
   const tableIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
     Check: forwardRef((props, ref) => <Check {...props} ref={ref} />),
@@ -48,113 +56,44 @@ const Supplier = () => {
     ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />),
   };
 
-  const [supplier, setSupplier] = useState([]);
+  const [disburses, setDisburses] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [iserror, setIserror] = useState(null);
   const [alertMessage, setAlertMessage] = useState([]);
 
-  const handleRowAdd = (newData, resolve) => {
-    //validation
-    let errorList = [];
-    if (newData.supplier_name === undefined) {
-      errorList.push("Please enter supplier name ");
-      setIserror(true);
-    }
-
-    if (newData.address === undefined) {
-      errorList.push("Please enter supplier address ");
-      setIserror(true);
-    }
-
-    if (errorList.length < 1) {
-      //no error
-      axios
-        .post("http://127.0.0.1:8000/api/supplier/store", newData)
-        .then((response) => {
-          setSupplier(response.data);
-          resolve();
-          setAlertMessage(["Supplier added Successfully  "]);
-          setIserror(false);
-        })
-        .catch((error) => {
-          setAlertMessage(["Oops, something went wrong!!!   "]);
-          setIserror(true);
-          resolve();
-        });
-    } else {
-      setAlertMessage(errorList);
-      setIserror(true);
-      resolve();
-    }
-  };
-
-  const handleRowUpdate = (newData, oldData, resolve) => {
-    //validation
-    //  console.log(newData);
-    let errorList = [];
-    if (newData.supplier_name === "") {
-      //alert("oooo");
-      errorList.push("this field can't be empty   ");
-      setIserror(true);
-    }
-
-    if (newData.address === "") {
-      //alert("oooo");
-      errorList.push("this field can't be empty   ");
-      setIserror(true);
-    }
-
-    if (errorList.length < 1) {
-      axios
-        .post(
-          `http://127.0.0.1:8000/api/supplier/update/${oldData.id}`,
-          newData
-        )
-        .then((response) => {
-          setSupplier(response.data);
-          setAlertMessage(["Record Updated Successfully  "]);
-          setIserror(false);
-          resolve();
-        })
-        .catch((error) => {
-          console.log(error);
-          setAlertMessage(["Oops, something went wrong!!!   "]);
-          setIserror(true);
-          resolve();
-          // setAlertMessage(["Trainee up   "]);
-        });
-    } else {
-      setAlertMessage(errorList);
-      setIserror(true);
-      resolve();
-    }
+  const redirectToDisburseForm = () => {
+    history.push(`/form/Disbursement/${company}`);
   };
 
   useEffect(() => {
     setIsLoading(true);
     axios
-      .get("http://127.0.0.1:8000/api/supplier")
+      .get(`http://127.0.0.1:8000/api/disbursement/${company}`)
       .then((response) => {
-        setSupplier(response.data);
+        setDisburses(response.data);
         setIsLoading(false);
       })
       .catch((err) => {
         console.log(err);
       });
-  }, []);
+  }, [company]);
+
+  const formatDate = (date) => {
+    return moment(date).format("MMM DD YYYY");
+  };
 
   const columns = [
     {
-      title: "NAME",
-      field: "supplier_name",
+      title: "DISBURSEMENT DATE",
+      field: "disbursement_date",
+      type: "date",
+      render: (row) => <span> {formatDate(row["disbursement_date"])}</span>,
     },
     {
-      title: "PHONE NUMBER",
-      field: "phone",
-    },
-    {
-      title: "ADDRESS",
-      field: "address",
+      title: "DISBURSEMENT ID",
+      field: "disbursement_id",
+      editable: "never",
+      render: (row) => <span>DIS - {row["disbursement_id"]}</span>,
     },
   ];
 
@@ -165,7 +104,7 @@ const Supplier = () => {
         <div className="container-fluid">
           <div className="row mb-2">
             <div className="col-sm-6">
-              <h1>Suppliers</h1>
+              <h1>{company} Disbursements</h1>
             </div>
           </div>
         </div>
@@ -186,8 +125,8 @@ const Supplier = () => {
               {!isLoading ? (
                 <MaterialTable
                   columns={columns}
-                  data={supplier}
-                  title="Supplier table"
+                  data={disburses}
+                  title="Disbursement table"
                   icons={tableIcons}
                   options={{
                     search: true,
@@ -197,24 +136,34 @@ const Supplier = () => {
                       color: "#FFF",
                     },
                   }}
-                  editable={{
-                    onRowUpdate: (newData, oldData) =>
-                      new Promise((resolve) => {
-                        handleRowUpdate(newData, oldData, resolve);
-                      }),
-                    onRowAdd: (newData) =>
-                      new Promise((resolve) => {
-                        handleRowAdd(newData, resolve);
-                      }),
-                  }}
+                  detailPanel={[
+                    {
+                      tooltip: "Show Participants",
+                      render: (rowData) => {
+                        return (
+                          <DisbursedItems
+                            disbursement_id={rowData.disbursement_id}
+                            company={company}
+                            disbursement_date={rowData.disbursement_date}
+                          />
+                        );
+                      },
+                    },
+                  ]}
+                  actions={[
+                    {
+                      icon: () => <AddIcon />,
+                      tooltip: "Add",
+                      onClick: (event, rowData) => {
+                        redirectToDisburseForm();
+                      },
+                      isFreeAction: true,
+                    },
+                  ]}
                 />
               ) : (
                 <CircularProgress />
               )}
-
-              {/* /.card-body */}
-
-              {/* /.card */}
             </div>
             {/* /.col */}
           </div>
@@ -227,4 +176,4 @@ const Supplier = () => {
   );
 };
 
-export default Supplier;
+export default Disbursement;

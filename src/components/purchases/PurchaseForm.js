@@ -3,24 +3,23 @@ import ErrorAlerts from "../layouts/alerts/ErrorAlerts";
 import SuccessAlerts from "../layouts/alerts/SuccessAlerts";
 import { CircularProgress, Grid, Paper, Card } from "@material-ui/core";
 import axios from "axios";
-import Autocomplete from "@material-ui/lab/Autocomplete";
 import TextField from "@material-ui/core/TextField";
 import { makeStyles } from "@material-ui/core/styles";
 import { useStateValue } from "../../StateProvider";
 import PurchaseSearch from "./PurchaseSearch";
 import PurchaseSearchList from "./PurchaseSearchList";
 import PurchaseList from "./PurchaseList";
+import { useParams } from "react-router-dom";
 
 const PurchaseForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [items, setItems] = useState([]);
-  const [loFiltered, setloFiltered] = useState(null);
-  const [olaFiltered, setolaFiltered] = useState(null);
-  const [searchWordLo, setSearchWordLo] = useState("");
-  const [searchWordOla, setSearchWordOla] = useState("");
+  const [filtered, setFiltered] = useState(null);
+  const [searchWord, setSearchWord] = useState("");
   const [purchaseDate, setPurchaseDate] = useState("");
-  const [iserror, setIserror] = useState(null);
-  const [alertMessage, setAlertMessage] = useState([]);
+
+  let params = useParams();
+  let { company, action } = params;
 
   const useStyles = makeStyles((theme) => ({
     paper: {
@@ -37,10 +36,6 @@ const PurchaseForm = () => {
   }));
   const classes = useStyles();
 
-  const handlePurchaseDateChange = (e) => {
-    setPurchaseDate(e.target.value);
-  };
-
   useEffect(() => {
     setIsLoading(true);
     axios
@@ -54,60 +49,41 @@ const PurchaseForm = () => {
       });
   }, []);
 
-  const getKeywordLo = (event) => {
-    setSearchWordLo(event.target.value);
-    let keyword = searchWordLo.toUpperCase();
-    //console.log(keyword);
+  const handlePurchaseDateChange = (e) => {
+    setPurchaseDate(e.target.value);
+  };
+
+  const getKeyword = (event) => {
+    setSearchWord(event.target.value);
+    let keyword = searchWord.toUpperCase();
+
     if (keyword.length > 1) {
       let filter = items.filter((item) => {
         let itemName = item.item_name.toUpperCase();
-        // console.log(productName);
+
         return itemName.indexOf(keyword) > -1;
       });
-      setloFiltered(filter);
+      setFiltered(filter);
     } else {
-      setloFiltered(null);
+      setFiltered(null);
     }
   };
 
-  const getKeywordOla = (event) => {
-    setSearchWordOla(event.target.value);
-    let keyword = searchWordOla.toUpperCase();
-    //console.log(keyword);
-    if (keyword.length > 1) {
-      let filter = items.filter((item) => {
-        let itemName = item.item_name.toUpperCase();
-        // console.log(productName);
-        return itemName.indexOf(keyword) > -1;
-      });
-      setolaFiltered(filter);
-    } else {
-      setolaFiltered(null);
-    }
+  const resetFilter = () => {
+    setSearchWord("");
+    setFiltered(null);
   };
 
-  const resetFilterLo = () => {
-    setSearchWordLo("");
-    setloFiltered(null);
-  };
+  const [
+    { purchaseOla, purchaseLo, disburseLo, disburseOla },
+    dispatch,
+  ] = useStateValue();
 
-  const resetFilterOla = () => {
-    setSearchWordOla("");
-    setolaFiltered(null);
-  };
+  // console.log(disburseLo);
 
-  const [{ purchase }, dispatch] = useStateValue();
-
-  //  console.log(purchase);
-
-  let filteredLo = loFiltered?.map((v) => ({
+  let filt = filtered?.map((v) => ({
     ...v,
-    company: "Landover",
-  }));
-
-  let filteredOla = olaFiltered?.map((v) => ({
-    ...v,
-    company: "Overland",
+    company: company,
   }));
 
   return (
@@ -117,7 +93,9 @@ const PurchaseForm = () => {
         <div className="container-fluid">
           <div className="row mb-2">
             <div className="col-sm-6">
-              <h1>Make Purchase</h1>
+              <h1>
+                {action} For {company}
+              </h1>
             </div>
           </div>
         </div>
@@ -130,19 +108,14 @@ const PurchaseForm = () => {
             <div className="col-12">
               <div className="card">{/* /.card-header */}</div>
 
-              {iserror ? <ErrorAlerts message={alertMessage} /> : null}
-              {iserror === false ? (
-                <SuccessAlerts message={alertMessage} />
-              ) : null}
-
               {!isLoading ? (
                 <>
                   <Paper className={classes.paper}>
                     <Grid container spacing={3}>
-                      <Grid item xs={12} sm={4}>
+                      <Grid item xs={12} sm={6}>
                         <TextField
                           id="purchase_date"
-                          label="Purchase Date"
+                          label={`${action} Date`}
                           variant="outlined"
                           type="date"
                           size="small"
@@ -155,33 +128,21 @@ const PurchaseForm = () => {
                           }}
                         />
                       </Grid>
-                      <Grid item xs={12} sm={4}>
+                      <Grid item xs={12} sm={6}>
                         <>
                           <PurchaseSearch
-                            keyword={getKeywordLo}
-                            filter={loFiltered}
-                            searchWord={searchWordLo}
-                            resetFilter={resetFilterLo}
-                            company="Landover"
+                            keyword={getKeyword}
+                            filter={filtered}
+                            searchWord={searchWord}
+                            resetFilter={resetFilter}
+                            company={company}
+                            action={action}
                           />
-                          {loFiltered !== null && loFiltered?.length > 0 ? (
-                            <PurchaseSearchList filtered={filteredLo} />
-                          ) : (
-                            ""
-                          )}
-                        </>
-                      </Grid>
-                      <Grid item xs={12} sm={4}>
-                        <>
-                          <PurchaseSearch
-                            keyword={getKeywordOla}
-                            filter={olaFiltered}
-                            searchWord={searchWordOla}
-                            resetFilter={resetFilterOla}
-                            company="Overland"
-                          />
-                          {olaFiltered !== null && olaFiltered?.length > 0 ? (
-                            <PurchaseSearchList filtered={filteredOla} />
+                          {filt !== null && filt?.length > 0 ? (
+                            <PurchaseSearchList
+                              filtered={filt}
+                              action={action}
+                            />
                           ) : (
                             ""
                           )}
@@ -190,10 +151,25 @@ const PurchaseForm = () => {
                     </Grid>
                   </Paper>
 
-                  {purchase?.length > 0 ? (
-                    <PurchaseList selectedItems={purchase} />
+                  {action === "Procurement" ? (
+                    <PurchaseList
+                      selectedItems={
+                        company === "Landover" ? purchaseLo : purchaseOla
+                      }
+                      purchaseDate={purchaseDate}
+                      company={company}
+                      action={action}
+                    />
                   ) : (
-                    ""
+                    <PurchaseList
+                      selectedItems={
+                        company === "Landover" ? disburseLo : disburseOla
+                      }
+                      purchaseDate={purchaseDate}
+                      company={company}
+                      action={action}
+                      dis={company === "Landover" ? disburseLo : disburseOla}
+                    />
                   )}
                 </>
               ) : (

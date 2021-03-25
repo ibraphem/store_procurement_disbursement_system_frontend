@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { useStateValue } from "../../StateProvider";
 
 const PurchasePrice = ({ pri, company, id }) => {
-  const [price, setPrice] = useState({ pri });
-  const [{ purchase }, dispatch] = useStateValue();
+  const [price, setPrice] = useState(pri);
+  const [{ purchaseOla, purchaseLo }, dispatch] = useStateValue();
 
   const updatePurchasePrice = (e) => {
     setPrice(e.target.value);

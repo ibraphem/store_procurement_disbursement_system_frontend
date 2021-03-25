@@ -60,10 +60,6 @@ const Department = () => {
       errorList.push("Please enter station, department or unit name ");
       setIserror(true);
     }
-    if (newData.company === undefined) {
-      errorList.push("Please select a company ");
-      setIserror(true);
-    }
 
     if (errorList.length < 1) {
       //no error
@@ -94,11 +90,6 @@ const Department = () => {
     if (newData.dept_name === "") {
       //alert("oooo");
       errorList.push("Department name can't be empty   ");
-      setIserror(true);
-    }
-    if (newData.company === "") {
-      //alert("oooo");
-      errorList.push("Company can't be empty   ");
       setIserror(true);
     }
 
@@ -146,11 +137,6 @@ const Department = () => {
     {
       title: "STATION/UNIT/DEPARTMENT",
       field: "dept_name",
-    },
-    {
-      title: "COMPANY",
-      field: "company",
-      lookup: { Landover: "Landover", Overland: "Overland" },
     },
   ];
 

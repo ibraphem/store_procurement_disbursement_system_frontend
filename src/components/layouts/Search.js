@@ -1,35 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
 import TextField from "@material-ui/core/TextField";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import IconButton from "@material-ui/core/IconButton";
 import SearchIcon from "@material-ui/icons/Search";
 import CloseIcon from "@material-ui/icons/Close";
 
-const PurchaseSearch = ({
-  keyword,
-  filter,
-  resetFilter,
-  searchWord,
-  company,
-  action,
-}) => {
+const Search = ({ keyword, resetFilter, searchWord }) => {
   return (
-    <>
+    <div style={{ float: "right", marginBottom: 10 }}>
       <TextField
-        id="outlined-basic"
-        label={`Items for ${action}`}
         size="small"
-        value={searchWord}
         variant="outlined"
+        value={searchWord}
+        placeholder="Search..."
         onChange={keyword}
-        fullWidth
-        InputLabelProps={{
-          shrink: true,
-        }}
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
-              {filter === null ? (
+              {searchWord === "" ? (
                 <IconButton disableRipple={true} size="small">
                   <SearchIcon />
                 </IconButton>
@@ -46,8 +34,8 @@ const PurchaseSearch = ({
           ),
         }}
       />
-    </>
+    </div>
   );
 };
 
-export default PurchaseSearch;
+export default Search;
