@@ -1,6 +1,5 @@
 import React, { useState, useEffect, forwardRef } from "react";
 import axios from "axios";
-import { CircularProgress } from "@material-ui/core";
 import MaterialTable from "material-table";
 import ArrowDownward from "@material-ui/icons/ArrowDownward";
 import Check from "@material-ui/icons/Check";
@@ -17,7 +16,7 @@ import Remove from "@material-ui/icons/Remove";
 import SaveAlt from "@material-ui/icons/SaveAlt";
 import Search from "@material-ui/icons/Search";
 import ViewColumn from "@material-ui/icons/ViewColumn";
-import AddIcon from "@material-ui/icons/Add";
+import { URD } from "../layouts/Config";
 import ErrorAlerts from "../layouts/alerts/ErrorAlerts";
 import SuccessAlerts from "../layouts/alerts/SuccessAlerts";
 
@@ -102,7 +101,7 @@ const PurchaseItems = ({ purchase_id, company, purchase_date }) => {
       //no error
       axios
         .post(
-          `http://127.0.0.1:8000/api/purchaseItem/add/${purchase_id}/${company}/${purchase_date}`,
+          `${URD}/purchaseItem/add/${purchase_id}/${company}/${purchase_date}`,
           newData
         )
         .then((response) => {
@@ -159,7 +158,7 @@ const PurchaseItems = ({ purchase_id, company, purchase_date }) => {
       // console.log(newData);
       //no error
       axios
-        .post("http://127.0.0.1:8000/api/purchaseItem/edit", newData)
+        .post(`${URD}/purchaseItem/edit`, newData)
         .then((response) => {
           setPurchaseItems(response.data);
           resolve();
@@ -182,7 +181,7 @@ const PurchaseItems = ({ purchase_id, company, purchase_date }) => {
     let errorList = [];
     if (oldData.supply_qty !== oldData.remainder) {
       errorList.push(
-        "You can't update this item because one or more of it has been disbursed  "
+        "You can't delete this item because one or more of it has been disbursed  "
       );
       setIserror(true);
     }
@@ -190,7 +189,7 @@ const PurchaseItems = ({ purchase_id, company, purchase_date }) => {
       // console.log(newData);
       //no error
       axios
-        .post("http://127.0.0.1:8000/api/purchaseItem/delete", oldData)
+        .post(`${URD}/purchaseItem/delete`, oldData)
         .then((response) => {
           setPurchaseItems(response.data);
           resolve();
@@ -214,7 +213,7 @@ const PurchaseItems = ({ purchase_id, company, purchase_date }) => {
     setIsLoading(true);
     // console.log(purchase_id);
     axios
-      .get(`http://127.0.0.1:8000/api/purchase/${purchase_id}`)
+      .get(`${URD}/purchase/${purchase_id}`)
       .then((response) => {
         if (mounted) {
           setPurchaseItems(response.data);
@@ -227,7 +226,7 @@ const PurchaseItems = ({ purchase_id, company, purchase_date }) => {
 
     setIsLoading(true);
     axios
-      .get("http://127.0.0.1:8000/api/item")
+      .get(`${URD}/item`)
       .then((response) => {
         if (mounted) {
           setAllItems(response.data);
@@ -240,7 +239,7 @@ const PurchaseItems = ({ purchase_id, company, purchase_date }) => {
 
     setIsLoading(true);
     axios
-      .get("http://127.0.0.1:8000/api/supplier")
+      .get(`${URD}/supplier`)
       .then((response) => {
         if (mounted) {
           setAllSuppliers(response.data);
@@ -281,14 +280,18 @@ const PurchaseItems = ({ purchase_id, company, purchase_date }) => {
     {
       title: "PRICE",
       field: "purchase_price",
-      render: (row) => <span>&#8358;{row["purchase_price"]}</span>,
+      render: (row) => (
+        <span>&#8358;{Number(row["purchase_price"]).toFixed(2)}</span>
+      ),
     },
     {
       title: "TOTAL",
       field: "purchase_price",
       editable: "never",
       render: (row) => (
-        <span>&#8358;{row["purchase_price"] * row["supply_qty"]}</span>
+        <span>
+          &#8358;{(row["purchase_price"] * row["supply_qty"]).toFixed(2)}
+        </span>
       ),
     },
     {
@@ -313,10 +316,10 @@ const PurchaseItems = ({ purchase_id, company, purchase_date }) => {
           color: "#fff",
         }}
         options={{
-          search: false,
+          search: true,
           sorting: false,
           showTitle: false,
-          paging: false,
+          paging: true,
           headerStyle: {
             backgroundColor: "green",
             color: "#FFF",

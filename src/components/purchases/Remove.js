@@ -4,7 +4,7 @@ import CancelIcon from "@material-ui/icons/Cancel";
 import Tooltip from "@material-ui/core/Tooltip";
 import { useStateValue } from "../../StateProvider";
 
-const Remove = ({ id, company, action, uid }) => {
+const Remove = ({ id, company, action, uid, dept }) => {
   const [{ purchaseLo, purchaseOla }, dispatch] = useStateValue();
   const removePurchase = () => {
     dispatch({
@@ -23,6 +23,7 @@ const Remove = ({ id, company, action, uid }) => {
       item: {
         id: id,
         uid: uid,
+        dept: dept,
         company: company,
       },
     });

@@ -11,6 +11,7 @@ import Remove from "./Remove";
 import ErrorAlerts from "../layouts/alerts/ErrorAlerts";
 import SuccessAlerts from "../layouts/alerts/SuccessAlerts";
 import { useHistory } from "react-router-dom";
+import { URD } from "../layouts/Config";
 
 const PurchaseList = ({
   selectedItems,
@@ -24,9 +25,12 @@ const PurchaseList = ({
     dispatch,
   ] = useStateValue();
 
+  //console.log(selectedItems);
+
   const [supplier, setSupplier] = useState([]);
   const [iserror, setIserror] = useState(null);
   const [units, setUnits] = useState([]);
+  const [isCompleting, setIsCompleting] = useState(false);
 
   const [alertMessage, setAlertMessage] = useState([]);
 
@@ -58,19 +62,18 @@ const PurchaseList = ({
     }
 
     if (errorList.length < 1) {
+      setIsCompleting(true);
       axios
-        .post(
-          `http://127.0.0.1:8000/api/procurement/store/${company}`,
-          purchaseData
-        )
+        .post(`${URD}/procurement/store/${company}`, purchaseData)
         .then((response) => {
-          //   console.log(response.data);
           if (response.data === 59) {
             setAlertMessage([
               `OOPs, a purchase has already been made on this day for ${company}. You may edit to this purchase`,
             ]);
             setIserror(true);
+            setIsCompleting(false);
           } else {
+            setIsCompleting(true);
             history.replace(`/procurement/${company}`);
             dispatch({
               type: "EMPTY_PURCHASE",
@@ -146,23 +149,32 @@ const PurchaseList = ({
     }
 
     if (errorList.length < 1) {
+      setIsCompleting(true);
       axios
-        .post(`http://127.0.0.1:8000/api/disburse/${company}`, disburseData)
+        .post(`${URD}/disburse/${company}`, disburseData)
         .then((response) => {
-          console.log(response.data);
+          //  console.log(response.data);
           if (response.data[0] === 10) {
             setAlertMessage([
               `The ${response.data[1]} quantity you want to disburse is ${response.data[2]} unit higher than what is in store `,
             ]);
             setIserror(true);
+            setIsCompleting(false);
           } else if (response.data === 59) {
             setAlertMessage([
               `OOPs, disbursement has already been done on this day for ${company}`,
             ]);
+            setIsCompleting(false);
             setIserror(true);
           } else {
+            setIsCompleting(true);
             history.replace(`/disbursement/${company}`);
-            // console.log("normal");
+            dispatch({
+              type: "EMPTY_DISBURSE",
+              item: {
+                company: company,
+              },
+            });
           }
         })
         .catch((error) => {
@@ -196,7 +208,7 @@ const PurchaseList = ({
                     <th>Quantity</th>
                     {action === "Procurement" ? <th>Unit Price</th> : ""}
                     {action === "Procurement" ? <th>Total</th> : ""}
-                    <th style={{ width: "40px" }}>&nbsp;</th>
+                    <th style={{ width: "40px" }}></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -208,6 +220,14 @@ const PurchaseList = ({
                         {" "}
                         <PurchaseSupplier
                           company={item.company}
+                          dep={
+                            action === "Disbursement"
+                              ? { dept: item.dept, dept_name: item.dept_name }
+                              : {
+                                  supplier: item.supplier,
+                                  supplier_name: item.supplier_name,
+                                }
+                          }
                           id={item.id}
                           action={action}
                           uid={action === "Disbursement" ? item.uid : null}
@@ -234,7 +254,9 @@ const PurchaseList = ({
                       {action === "Procurement" ? (
                         <td>
                           &#8358;
-                          {parseInt(item.quantity) * parseInt(item.price)}
+                          {(Number(item.quantity) * Number(item.price)).toFixed(
+                            2
+                          )}
                         </td>
                       ) : null}
 
@@ -244,19 +266,20 @@ const PurchaseList = ({
                           company={item.company}
                           action={action}
                           uid={action === "Disbursement" ? item.uid : null}
+                          dept={action === "Disbursement" ? item.dept : null}
                         />
                       </td>
                     </tr>
                   ))}
                   {action === "Procurement" ? (
                     <tr>
-                      <td colSpan="3">&nbsp;</td>
+                      <td colSpan="3"></td>
                       <td colSpan="3">
                         <h5>
-                          Total: &nbsp; &nbsp; &nbsp; &nbsp; &#8358;
+                          Total:{"       "}&#8358;
                           {company === "Landover"
-                            ? getPurchaseTotalLo(purchaseLo)
-                            : getPurchaseTotalOla(purchaseOla)}
+                            ? getPurchaseTotalLo(purchaseLo).toFixed(2)
+                            : getPurchaseTotalOla(purchaseOla).toFixed(2)}
                         </h5>
                       </td>
                     </tr>
@@ -264,21 +287,23 @@ const PurchaseList = ({
 
                   {action === "Procurement" ? (
                     <tr>
-                      <td colSpan="3">&nbsp;</td>
+                      <td colSpan="3"></td>
                       <td colSpan="3">
                         <CompletePurchase
                           completed={onPurchase}
                           action={action}
+                          isCompleting={isCompleting}
                         />
                       </td>
                     </tr>
                   ) : (
                     <tr>
-                      <td colSpan="2">&nbsp;</td>
+                      <td colSpan="2"></td>
                       <td colSpan="2">
                         <CompletePurchase
                           completed={onDisburse}
                           action={action}
+                          isCompleting={isCompleting}
                         />
                       </td>
                     </tr>

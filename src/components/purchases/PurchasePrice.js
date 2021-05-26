@@ -27,7 +27,7 @@ const PurchasePrice = ({ pri, company, id }) => {
         className="form-control"
         placeholder="Price"
         onChange={updatePurchasePrice}
-        value={price}
+        value={pri}
         style={{ width: "70px" }}
       />
     </div>

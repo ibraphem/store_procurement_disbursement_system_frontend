@@ -102,7 +102,7 @@ const useStyles2 = makeStyles({
   },
 });
 
-const DisbursementHistory = ({ disburses }) => {
+const DisbursementHistory = ({ disburses, company }) => {
   const classes = useStyles2();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -134,12 +134,16 @@ const DisbursementHistory = ({ disburses }) => {
       >
         <TableHead>
           <TableRow>
-            <TableCell className={classes.tableHeadCell}>DISBURSE ID</TableCell>
+            {company === "Uniform" ? null : (
+              <TableCell className={classes.tableHeadCell}>
+                DISBURSEMENT ID
+              </TableCell>
+            )}
             <TableCell className={classes.tableHeadCell} align="center">
               DATE
             </TableCell>
             <TableCell className={classes.tableHeadCell} align="center">
-              DEPT/UNIT/STATION
+              {company === "Uniform" ? "Personnel" : "DEPT/UNIT/STATION"}
             </TableCell>
             <TableCell className={classes.tableHeadCell} align="center">
               QUANTITY
@@ -155,14 +159,19 @@ const DisbursementHistory = ({ disburses }) => {
             : disburses
           ).map((disburse, index) => (
             <TableRow key={index}>
-              <TableCell component="th" scope="row">
-                PUR - {disburse.disbursement_id}
-              </TableCell>
+              {company === "Uniform" ? null : (
+                <TableCell component="th" scope="row">
+                  DIS - {disburse.disbursement_id}
+                </TableCell>
+              )}
+
               <TableCell align="center">
                 {formatDate(disburse.disbursement_date)}
               </TableCell>
               <TableCell align="center">
-                {disburse.department.dept_name}
+                {company === "Uniform"
+                  ? disburse.personnel
+                  : disburse.department.dept_name}
               </TableCell>
               <TableCell align="center">{disburse.quantity}</TableCell>
             </TableRow>

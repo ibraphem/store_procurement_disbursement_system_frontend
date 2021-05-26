@@ -18,6 +18,8 @@ import Search from "@material-ui/icons/Search";
 import ViewColumn from "@material-ui/icons/ViewColumn";
 import SuccessAlerts from "../layouts/alerts/SuccessAlerts";
 import ErrorAlerts from "../layouts/alerts/ErrorAlerts";
+import DepartmentItems from "../departments/DepartmentItems";
+import { URD } from "../layouts/Config";
 
 const Department = () => {
   const tableIcons = {
@@ -64,7 +66,7 @@ const Department = () => {
     if (errorList.length < 1) {
       //no error
       axios
-        .post("http://127.0.0.1:8000/api/department/store", newData)
+        .post(`${URD}/department/store`, newData)
         .then((response) => {
           setUnits(response.data);
           resolve();
@@ -95,10 +97,7 @@ const Department = () => {
 
     if (errorList.length < 1) {
       axios
-        .post(
-          `http://127.0.0.1:8000/api/department/update/${oldData.id}`,
-          newData
-        )
+        .post(`${URD}/department/update/${oldData.id}`, newData)
         .then((response) => {
           // console.log(response.data);
           setUnits(response.data);
@@ -123,7 +122,7 @@ const Department = () => {
   useEffect(() => {
     setIsLoading(true);
     axios
-      .get("http://127.0.0.1:8000/api/department")
+      .get(`${URD}/department`)
       .then((response) => {
         setUnits(response.data);
         setIsLoading(false);
@@ -135,7 +134,7 @@ const Department = () => {
 
   const columns = [
     {
-      title: "STATION/UNIT/DEPARTMENT",
+      title: "DIV/UNIT",
       field: "dept_name",
     },
   ];
@@ -147,7 +146,7 @@ const Department = () => {
         <div className="container-fluid">
           <div className="row mb-2">
             <div className="col-sm-6">
-              <h1>Stations/Units/Departments</h1>
+              <h1>Div/Units</h1>
             </div>
           </div>
         </div>
@@ -189,6 +188,19 @@ const Department = () => {
                         handleRowAdd(newData, resolve);
                       }),
                   }}
+                  detailPanel={[
+                    {
+                      tooltip: "Show",
+                      render: (rowData) => {
+                        return (
+                          <DepartmentItems
+                            id={rowData.id}
+                            name={rowData.dept_name}
+                          />
+                        );
+                      },
+                    },
+                  ]}
                 />
               ) : (
                 <CircularProgress />

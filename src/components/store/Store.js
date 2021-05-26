@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import StoreTable from "./StoreTable";
+import { URD } from "../layouts/Config";
 
 const Store = () => {
   let params = useParams();
@@ -10,10 +11,10 @@ const Store = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // console.log(company);
     setIsLoading(true);
+
     axios
-      .get(`http://127.0.0.1:8000/api/store/${company}`)
+      .get(`${URD}/${company === "Uniform" ? "stores" : "store"}/${company}`)
       .then((response) => {
         //  console.log(response.data);
         setStoreItems(response.data);

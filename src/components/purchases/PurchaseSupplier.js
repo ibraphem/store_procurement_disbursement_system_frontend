@@ -3,16 +3,17 @@ import axios from "axios";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import TextField from "@material-ui/core/TextField";
 import { useStateValue } from "../../StateProvider";
+import { URD } from "../layouts/Config";
 
-const PurchaseSupplier = ({ id, company, action, uid }) => {
+const PurchaseSupplier = ({ id, company, action, uid, dep }) => {
   const [supplier, setSupplier] = useState([]);
-  const [selectSupplier, setSelectSupplier] = useState("");
+
   const [units, setUnits] = useState([]);
 
   useEffect(() => {
     let mounted = true;
     axios
-      .get("http://127.0.0.1:8000/api/supplier")
+      .get(`${URD}/supplier`)
       .then((response) => {
         if (mounted) {
           setSupplier(response.data);
@@ -23,7 +24,7 @@ const PurchaseSupplier = ({ id, company, action, uid }) => {
       });
 
     axios
-      .get("http://127.0.0.1:8000/api/department")
+      .get(`${URD}/department`)
       .then((response) => {
         if (mounted) {
           setUnits(response.data);
@@ -43,46 +44,36 @@ const PurchaseSupplier = ({ id, company, action, uid }) => {
   //  console.log(supplier);
 
   const updatePurchaseSupplier = (value) => {
-    if (value.id !== null) {
-      setSelectSupplier(value.id);
-    } else {
-      setSelectSupplier("1");
-    }
-
     dispatch({
       type: "UPDATE_PURCHASE_SUPPLIER",
       item: {
         id: id,
         supplier: value.id,
+        supplier_name: value.supplier_name,
         company: company,
       },
     });
   };
 
   const updateDisburseUnit = (value) => {
-    if (value.id !== null) {
-      setSelectSupplier(value.id);
-    } else {
-      setSelectSupplier("1");
-    }
-
+    console.log(value);
     dispatch({
       type: "UPDATE_DISBURSE_UNIT",
       item: {
         id: id,
         uid: uid,
         dept: value.id,
+        dept_name: value.dept_name,
         company: company,
       },
     });
   };
 
-  //console.log(purchase);
-
   return (
     <Autocomplete
-      id="combo-box-demo"
+      value={dep}
       size="small"
+      disableClearable={true}
       options={action === "Procurement" ? supplier : units}
       getOptionLabel={(option) =>
         action === "Procurement" ? option.supplier_name : option.dept_name

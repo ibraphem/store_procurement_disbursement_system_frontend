@@ -1,73 +1,58 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import Nav from "./Nav";
 
 const NavBar = () => {
   return (
     <aside className="main-sidebar sidebar-dark-primary elevation-4">
       {/* Brand Logo */}
-      <a href="index3.html" className="brand-link">
-        <img
-          src="dist/img/AdminLTELogo.png"
-          alt="AdminLTE Logo"
-          className="brand-image img-circle elevation-3"
-          style={{ opacity: ".8" }}
-        />
-        <span className="brand-text font-weight-light">AdminLTE 3</span>
-      </a>
+
       {/* Sidebar */}
       <div className="sidebar">
         {/* Sidebar user panel (optional) */}
         <div className="user-panel mt-3 pb-3 mb-3 d-flex">
-          <div className="image">
-            <img
-              src="dist/img/user2-160x160.jpg"
-              className="img-circle elevation-2"
-              alt="User Image"
-            />
-          </div>
           <div className="info">
-            <a href="#" className="d-block">
-              Alexander Pierce
-            </a>
+            <h5 style={{ color: "#fff" }}>STORE MANAGEMENT</h5>
           </div>
         </div>
-        {/* Sidebar Menu */}
-        <nav className="mt-2">
+
+        <Nav />
+        {/*      <nav className="mt-2">
           <ul
             className="nav nav-pills nav-sidebar flex-column"
             data-widget="treeview"
             role="menu"
             data-accordion="false"
           >
-            {/* Add icons to the links using the .nav-icon class
-             with font-awesome or any other icon font library */}
+          Add icons to the links using the .nav-icon class
+             with font-awesome or any other icon font library 
             <li className="nav-item">
-              <Link to="/" className="nav-link active">
+              <Link to="/dashboard" className="nav-link active">
                 <i className="nav-icon fas fa-th" />
                 <p>Dashboard</p>
               </Link>
             </li>
             <li className="nav-item">
               <Link to="/items" className="nav-link">
-                <i className="nav-icon fas fa-th" />
+                <i className="nav-icon fas fa-sitemap" />
                 <p>Items</p>
               </Link>
             </li>
             <li className="nav-item">
               <Link to="/departments" className="nav-link">
-                <i className="nav-icon fas fa-th" />
-                <p>Stations/Units/Depts</p>
+                <i className="nav-icon fas fa-university" />
+                <p>Div/Units</p>
               </Link>
             </li>
             <li className="nav-item">
               <Link to="/suppliers" className="nav-link">
-                <i className="nav-icon fas fa-th" />
+                <i className="nav-icon fas fa-address-card" />
                 <p>Suppliers</p>
               </Link>
             </li>
             <li className="nav-item has-treeview">
-              <a href="#" className="nav-link">
-                <i className="nav-icon fas fa-chart-pie" />
+              <a style={{ cursor: "pointer" }} className="nav-link">
+                <i className="nav-icon fas fa-archive" />
                 <p>
                   Store
                   <i className="right fas fa-angle-left" />
@@ -90,8 +75,8 @@ const NavBar = () => {
             </li>
 
             <li className="nav-item has-treeview">
-              <a href="#" className="nav-link">
-                <i className="nav-icon fas fa-chart-pie" />
+              <a style={{ cursor: "pointer" }} className="nav-link">
+                <i className="nav-icon fas fa-cart-plus" />
                 <p>
                   Procurement
                   <i className="right fas fa-angle-left" />
@@ -114,7 +99,7 @@ const NavBar = () => {
             </li>
 
             <li className="nav-item has-treeview">
-              <a href="#" className="nav-link">
+              <a style={{ cursor: "pointer" }} className="nav-link">
                 <i className="nav-icon fas fa-chart-pie" />
                 <p>
                   Disbursement
@@ -136,9 +121,67 @@ const NavBar = () => {
                 </li>
               </ul>
             </li>
+            <li className="nav-item has-treeview">
+              <a style={{ cursor: "pointer" }} className="nav-link">
+                <i className="nav-icon fas fa-anchor" />
+                <p>
+                  Uniforms
+                  <i className="right fas fa-angle-left" />
+                </p>
+              </a>
+              <ul className="nav nav-treeview">
+                <li className="nav-item">
+                  <Link to="/uniforms" className="nav-link">
+                    <i className="far fa-circle nav-icon" />
+                    <p>List</p>
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link to={`/uniformer/Landover`} className="nav-link">
+                    <i className="far fa-circle nav-icon" />
+                    <p>Landover</p>
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link to={`/uniformer/Overland`} className="nav-link">
+                    <i className="far fa-circle nav-icon" />
+                    <p>Overland</p>
+                  </Link>
+                </li>
+              </ul>
+            </li>
+            <li className="nav-item has-treeview">
+              <a style={{ cursor: "pointer" }} className="nav-link">
+                <i className="nav-icon fas fa-book" />
+                <p>
+                  Report
+                  <i className="right fas fa-angle-left" />
+                </p>
+              </a>
+              <ul className="nav nav-treeview">
+                <li className="nav-item">
+                  <Link to={`/report/monthly`} className="nav-link">
+                    <i className="far fa-circle nav-icon" />
+                    <p>Monthly</p>
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link to={`/reports/Procurement`} className="nav-link">
+                    <i className="far fa-circle nav-icon" />
+                    <p>Procurement</p>
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link to={`/reports/Disbursement`} className="nav-link">
+                    <i className="far fa-circle nav-icon" />
+                    <p>Disbursement</p>
+                  </Link>
+                </li>
+              </ul>
+            </li>
           </ul>
         </nav>
-        {/* /.sidebar-menu */}
+       */}
       </div>
       {/* /.sidebar */}
     </aside>

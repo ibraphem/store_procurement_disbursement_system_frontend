@@ -18,6 +18,7 @@ import Search from "@material-ui/icons/Search";
 import ViewColumn from "@material-ui/icons/ViewColumn";
 import SuccessAlerts from "../layouts/alerts/SuccessAlerts";
 import ErrorAlerts from "../layouts/alerts/ErrorAlerts";
+import { URD } from "../layouts/Config";
 
 const Supplier = () => {
   const tableIcons = {
@@ -69,7 +70,7 @@ const Supplier = () => {
     if (errorList.length < 1) {
       //no error
       axios
-        .post("http://127.0.0.1:8000/api/supplier/store", newData)
+        .post(`${URD}/supplier/store`, newData)
         .then((response) => {
           setSupplier(response.data);
           resolve();
@@ -106,10 +107,7 @@ const Supplier = () => {
 
     if (errorList.length < 1) {
       axios
-        .post(
-          `http://127.0.0.1:8000/api/supplier/update/${oldData.id}`,
-          newData
-        )
+        .post(`${URD}/supplier/update/${oldData.id}`, newData)
         .then((response) => {
           setSupplier(response.data);
           setAlertMessage(["Record Updated Successfully  "]);
@@ -133,7 +131,7 @@ const Supplier = () => {
   useEffect(() => {
     setIsLoading(true);
     axios
-      .get("http://127.0.0.1:8000/api/supplier")
+      .get(`${URD}/supplier`)
       .then((response) => {
         setSupplier(response.data);
         setIsLoading(false);

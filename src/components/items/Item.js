@@ -18,6 +18,7 @@ import Search from "@material-ui/icons/Search";
 import ViewColumn from "@material-ui/icons/ViewColumn";
 import SuccessAlerts from "../layouts/alerts/SuccessAlerts";
 import ErrorAlerts from "../layouts/alerts/ErrorAlerts";
+import { URD } from "../layouts/Config";
 
 const Item = () => {
   const tableIcons = {
@@ -49,6 +50,7 @@ const Item = () => {
   };
 
   const [items, setItems] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [iserror, setIserror] = useState(null);
   const [alertMessage, setAlertMessage] = useState([]);
@@ -61,10 +63,20 @@ const Item = () => {
       setIserror(true);
     }
 
+    if (newData.item_name === undefined) {
+      errorList.push("Category can't be empty");
+      setIserror(true);
+    }
+
+    if (newData.reorder === "" || isNaN(newData.reorder)) {
+      errorList.push("Reorder limit has to be a valid integer   ");
+      setIserror(true);
+    }
+
     if (errorList.length < 1) {
       //no error
       axios
-        .post("http://127.0.0.1:8000/api/item/store", newData)
+        .post(`${URD}/item/store`, newData)
         .then((response) => {
           setItems(response.data);
           resolve();
@@ -93,9 +105,14 @@ const Item = () => {
       setIserror(true);
     }
 
+    if (newData.reorder === "" || isNaN(newData.reorder)) {
+      errorList.push("Reorder limit has to be a valid integer   ");
+      setIserror(true);
+    }
+
     if (errorList.length < 1) {
       axios
-        .post(`http://127.0.0.1:8000/api/item/update/${oldData.id}`, newData)
+        .post(`${URD}/item/update/${oldData.id}`, newData)
         .then((response) => {
           // console.log(response.data);
           setItems(response.data);
@@ -120,7 +137,7 @@ const Item = () => {
   useEffect(() => {
     setIsLoading(true);
     axios
-      .get("http://127.0.0.1:8000/api/item")
+      .get(`${URD}/item`)
       .then((response) => {
         setItems(response.data);
         setIsLoading(false);
@@ -128,12 +145,38 @@ const Item = () => {
       .catch((err) => {
         console.log(err);
       });
+
+    setIsLoading(true);
+    axios
+      .get(`${URD}/category`)
+      .then((response) => {
+        setCategories(response.data);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }, []);
+
+  const category = {};
+  categories.map((cat) => {
+    const { id, name } = cat;
+    category[id] = name;
+  });
 
   const columns = [
     {
       title: "ITEM NAME",
       field: "item_name",
+    },
+    {
+      title: "CATEGORY",
+      field: "category_id",
+      lookup: category,
+    },
+    {
+      title: "REORDER LIMIT",
+      field: "reorder",
     },
   ];
 

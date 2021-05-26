@@ -7,13 +7,13 @@ export const initialState = {
 
 export const getPurchaseTotalLo = (purchaseLo) =>
   purchaseLo?.reduce(
-    (amount, item) => parseInt(item.price) * parseInt(item.quantity) + amount,
+    (amount, item) => Number(item.price) * Number(item.quantity) + amount,
     0
   );
 
 export const getPurchaseTotalOla = (purchaseOla) =>
   purchaseOla?.reduce(
-    (amount, item) => parseInt(item.price) * parseInt(item.quantity) + amount,
+    (amount, item) => Number(item.price) * Number(item.quantity) + amount,
     0
   );
 
@@ -154,6 +154,7 @@ const reducer = (state, action) => {
 
         if (ind >= 0) {
           oldPurchaseLo[ind].supplier = action.item.supplier;
+          oldPurchaseLo[ind].supplier_name = action.item.supplier_name;
         } else {
           console.log("this item is missing");
         }
@@ -169,6 +170,7 @@ const reducer = (state, action) => {
 
         if (ind >= 0) {
           oldPurchaseOla[ind].supplier = action.item.supplier;
+          oldPurchaseOla[ind].supplier_name = action.item.supplier_name;
         } else {
           console.log("this item is missing");
         }
@@ -186,6 +188,7 @@ const reducer = (state, action) => {
 
         if (ind >= 0) {
           oldDisburseLo[ind].dept = action.item.dept;
+          oldDisburseLo[ind].dept_name = action.item.dept_name;
         } else {
           console.log("this item is missing");
         }
@@ -200,6 +203,7 @@ const reducer = (state, action) => {
 
         if (ind >= 0) {
           oldDisburseOla[ind].dept = action.item.dept;
+          oldDisburseOla[ind].dept_name = action.item.dept_name;
         } else {
           console.log("this item is missing");
         }
@@ -247,9 +251,11 @@ const reducer = (state, action) => {
         const index = state.disburseLo.findIndex(
           (disburseItem) =>
             disburseItem.uid === action.item.uid &&
-            disburseItem.id === action.item.id
+            disburseItem.id === action.item.id &&
+            disburseItem.dept === action.item.dept
         );
         if (index >= 0) {
+          console.log(index);
           newDisburseLo.splice(index, 1);
         } else {
           // console.log(newBasket);
@@ -262,7 +268,8 @@ const reducer = (state, action) => {
         const index = state.disburseOla.findIndex(
           (disburseItem) =>
             disburseItem.uid === action.item.uid &&
-            disburseItem.id === action.item.id
+            disburseItem.id === action.item.id &&
+            disburseItem.dept === action.item.dept
         );
         if (index >= 0) {
           newDisburseOla.splice(index, 1);
@@ -283,6 +290,19 @@ const reducer = (state, action) => {
         return {
           ...state,
           purchaseOla: [],
+        };
+      }
+
+    case "EMPTY_DISBURSE":
+      if (action.item.company === "Landover") {
+        return {
+          ...state,
+          disburseLo: [],
+        };
+      } else {
+        return {
+          ...state,
+          disburseOla: [],
         };
       }
 

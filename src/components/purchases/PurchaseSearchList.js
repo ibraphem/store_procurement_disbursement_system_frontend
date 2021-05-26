@@ -61,30 +61,32 @@ const PurchaseSearchList = ({ filtered, action }) => {
         company: item.company,
         price: 0,
         quantity: 1,
-        supplier: 3,
+        supplier: 1,
+        supplier_name: "OPEN MARKET",
       },
     });
   };
 
-  let i = 1;
-
   const addToDisburse = (item) => {
     setUid((prevUid) => prevUid + 1);
+    // console.log(Math.random().toString(36).replace("0.", ""));
 
     dispatch({
       type: "ADD_TO_DISBURSE",
       item: {
-        uid: uid,
+        uid: Math.random().toString(36).replace("0.", ""),
         id: item.id,
         item_name: item.item_name,
         company: item.company,
         dept: 1,
+        dept_name: "GENERAL PROCURMENT",
         quantity: 1,
       },
     });
     //   console.log(dispatch);
   };
 
+  console.log(uid);
   return (
     <List className={classes.root}>
       {filtered.map((item) => (
@@ -107,26 +109,40 @@ const PurchaseSearchList = ({ filtered, action }) => {
             )}
           </ListItemText>
           <ListItemSecondaryAction>
-            <IconButton
-              edge="end"
-              onClick={
-                action === "Procurement"
-                  ? () => addToPurchase(item)
-                  : () => addToDisburse(item)
-              }
-              aria-label="add"
-              disabled={
-                checkPurchaseList(item.id, item.company) === -1 ? false : true
-              }
-            >
-              <AddShoppingCartIcon
-                style={
-                  checkPurchaseList(item.id, item.company) === -1
-                    ? { color: "#000", fontWeight: "bold" }
-                    : { color: "#ccc", fontWeight: "normal" }
-                }
-              />
-            </IconButton>
+            {action === "Procurement" ? (
+              <>
+                <IconButton
+                  edge="end"
+                  onClick={() => addToPurchase(item)}
+                  aria-label="add"
+                  disabled={
+                    checkPurchaseList(item.id, item.company) === -1
+                      ? false
+                      : true
+                  }
+                >
+                  <AddShoppingCartIcon
+                    style={
+                      checkPurchaseList(item.id, item.company) === -1
+                        ? { color: "#000", fontWeight: "bold" }
+                        : { color: "#ccc", fontWeight: "normal" }
+                    }
+                  />
+                </IconButton>
+              </>
+            ) : (
+              <>
+                <IconButton
+                  edge="end"
+                  onClick={() => addToDisburse(item)}
+                  aria-label="add"
+                >
+                  <AddShoppingCartIcon
+                    style={{ color: "#000", fontWeight: "bold" }}
+                  />
+                </IconButton>
+              </>
+            )}
           </ListItemSecondaryAction>
         </ListItem>
       ))}

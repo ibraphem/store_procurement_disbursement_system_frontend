@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
@@ -18,6 +18,7 @@ import LastPageIcon from "@material-ui/icons/LastPage";
 import axios from "axios";
 import Button from "@material-ui/core/Button";
 import { CircularProgress } from "@material-ui/core";
+import { URD } from "../layouts/Config";
 import Search from "../layouts/Search";
 import { Link } from "react-router-dom";
 
@@ -108,20 +109,32 @@ const useStyles2 = makeStyles({
 });
 
 const StoreTable = ({ items, company }) => {
+  function usePrevious(value) {
+    // The ref object is a generic container whose current property is mutable ...
+    // ... and can hold any value, similar to an instance property on a class
+    const ref = useRef();
+    // Store current value in ref
+    useEffect(() => {
+      ref.current = value;
+    }, [value]); // Only re-run if value changes
+    // Return previous value (happens before update in useEffect above)
+    return ref.current;
+  }
+
   const classes = useStyles2();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [storeItems, setStoreItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [searchWord, setSearchWord] = useState("");
+  const prevStoreIitems = usePrevious(storeItems);
 
-  useEffect(() => {
-    // console.log(company);
+  useEffect(async () => {
+    console.log(company);
     setIsLoading(true);
-    axios
-      .get(`http://127.0.0.1:8000/api/store/${company}`)
+    await axios
+      .get(`${URD}/${company === "Uniform" ? "stores" : "store"}/${company}`)
       .then((response) => {
-        //  console.log(response.data);
         setStoreItems(response.data);
         setIsLoading(false);
       })
@@ -130,24 +143,33 @@ const StoreTable = ({ items, company }) => {
       });
   }, [company]);
 
-  const getKeyword = (event) => {
-    setSearchWord(event.target.value);
-    let keyword = searchWord?.toUpperCase();
+  //console.log(items);
+  // console.log(storeItems);
 
-    if (keyword.length > 1) {
-      let filter = items.filter((storeItem) => {
-        let itemName = storeItem.item.item_name.toUpperCase();
-        return itemName.indexOf(keyword) > -1;
+  const getKeyword = (event) => {
+    let keyword = event.target.value.toUpperCase();
+    setSearchWord(keyword);
+    // console.log(keyword);
+    if (keyword !== "") {
+      let filter = storeItems.filter((storeItem) => {
+        let itemName = storeItem.item?.item_name.toUpperCase();
+        console.log(itemName);
+        return itemName?.indexOf(event.target.value.toUpperCase()) > -1;
       });
       setStoreItems(filter);
     } else {
       setStoreItems(items);
     }
+
+    //
   };
+
+  //console.log(storeItems);
 
   const resetFilter = () => {
     setSearchWord("");
     setStoreItems(items);
+    //   setStoreItems(items);
   };
 
   const emptyRows =
@@ -162,14 +184,14 @@ const StoreTable = ({ items, company }) => {
     setPage(0);
   };
 
-  // console.log(company);
+  console.log(storeItems);
 
   return (
     <>
       {!isLoading ? (
         <>
           <Search
-            keyword={getKeyword}
+            keywords={getKeyword}
             resetFilter={resetFilter}
             searchWord={searchWord}
           />
@@ -183,13 +205,16 @@ const StoreTable = ({ items, company }) => {
               <TableHead>
                 <TableRow>
                   <TableCell className={classes.tableHeadCell}>
-                    ITEM NAME
+                    {company === "Uniform" ? "Uniform" : "Item Name"}
                   </TableCell>
                   <TableCell className={classes.tableHeadCell} align="center">
                     QUANTITY
                   </TableCell>
                   <TableCell className={classes.tableHeadCell} align="center">
-                    PRICE VALUE
+                    UNIT PRICE
+                  </TableCell>
+                  <TableCell className={classes.tableHeadCell} align="center">
+                    TOTAL
                   </TableCell>
                   <TableCell className={classes.tableHeadCell} align="center">
                     &nbsp;
@@ -204,17 +229,33 @@ const StoreTable = ({ items, company }) => {
                     )
                   : storeItems
                 ).map((storeItem) => (
-                  <TableRow key={storeItem.item_id}>
+                  <TableRow
+                    key={
+                      company === "Uniform"
+                        ? storeItem.uniform_id
+                        : storeItem.item_id
+                    }
+                  >
                     <TableCell component="th" scope="row">
-                      {storeItem.item.item_name}
+                      {company === "Uniform"
+                        ? storeItem.uniform?.type
+                        : storeItem.item?.item_name}
                     </TableCell>
                     <TableCell align="center">{storeItem.quantity}</TableCell>
                     <TableCell align="center">
-                      &#8358;{storeItem.price}
+                      &#8358;
+                      {Number(storeItem.price / storeItem.quantity).toFixed(2)}
+                    </TableCell>
+                    <TableCell align="center">
+                      &#8358;{Number(storeItem.price).toFixed(2)}
                     </TableCell>
                     <TableCell align="center">
                       <Link
-                        to={`/${storeItem.item.item_name}/${company}/${storeItem.item_id}/details`}
+                        to={
+                          company === "Uniform"
+                            ? `/${storeItem.uniform?.type}/${company}/${storeItem.uniform_id}/details`
+                            : `/${storeItem.item?.item_name}/${company}/${storeItem.item_id}/details`
+                        }
                       >
                         <Button
                           variant="contained"

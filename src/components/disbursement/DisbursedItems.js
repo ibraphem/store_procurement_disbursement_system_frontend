@@ -16,9 +16,7 @@ import Remove from "@material-ui/icons/Remove";
 import SaveAlt from "@material-ui/icons/SaveAlt";
 import Search from "@material-ui/icons/Search";
 import ViewColumn from "@material-ui/icons/ViewColumn";
-import AddIcon from "@material-ui/icons/Add";
-import ErrorAlerts from "../layouts/alerts/ErrorAlerts";
-import SuccessAlerts from "../layouts/alerts/SuccessAlerts";
+import { URD } from "../layouts/Config";
 
 const DisbursedItems = ({ disbursement_id }) => {
   const [disburseItems, setDisburseItems] = useState([]);
@@ -64,7 +62,7 @@ const DisbursedItems = ({ disbursement_id }) => {
   useEffect(() => {
     setIsLoading(true);
     axios
-      .get(`http://127.0.0.1:8000/api/disbursed/${disbursement_id}`)
+      .get(`${URD}/disbursed/${disbursement_id}`)
       .then((response) => {
         setDisburseItems(response.data);
         setIsLoading(false);
@@ -79,7 +77,7 @@ const DisbursedItems = ({ disbursement_id }) => {
 
     axios
       .post(
-        `http://127.0.0.1:8000/api/disbursedItem/delete/${disbursement_id}/${oldData.item_id}/${oldData.department_id}`
+        `${URD}/disbursedItem/delete/${disbursement_id}/${oldData.item_id}/${oldData.department_id}`
       )
       .then((response) => {
         setDisburseItems(response.data);
@@ -97,13 +95,11 @@ const DisbursedItems = ({ disbursement_id }) => {
   const columns = [
     {
       title: "ITEM NAME",
-      field: "item",
-      render: (row) => <span>{row["item"].item_name}</span>,
+      field: "item_name",
     },
     {
       title: "STATION/UNIT/DEPARTMENT",
-      field: "department",
-      render: (row) => <span>{row["department"].dept_name}</span>,
+      field: "dept_name",
     },
     {
       title: "QUANTITY",
@@ -121,11 +117,11 @@ const DisbursedItems = ({ disbursement_id }) => {
         color: "#fff",
       }}
       options={{
-        search: false,
+        search: true,
         sorting: false,
         showTitle: false,
-        toolbar: false,
-        paging: false,
+        //   toolbar: true,
+        paging: true,
         headerStyle: {
           backgroundColor: "red",
           color: "#FFF",

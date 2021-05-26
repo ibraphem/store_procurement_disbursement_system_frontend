@@ -22,6 +22,7 @@ import SuccessAlerts from "../layouts/alerts/SuccessAlerts";
 import ErrorAlerts from "../layouts/alerts/ErrorAlerts";
 import { useParams } from "react-router-dom";
 import moment from "moment";
+import { URD } from "../layouts/Config";
 import DisbursedItems from "./DisbursedItems";
 
 const Disbursement = () => {
@@ -68,7 +69,7 @@ const Disbursement = () => {
   useEffect(() => {
     setIsLoading(true);
     axios
-      .get(`http://127.0.0.1:8000/api/disbursement/${company}`)
+      .get(`${URD}/disbursement/${company}`)
       .then((response) => {
         setDisburses(response.data);
         setIsLoading(false);
@@ -80,6 +81,44 @@ const Disbursement = () => {
 
   const formatDate = (date) => {
     return moment(date).format("MMM DD YYYY");
+  };
+
+  const handleRowUpdate = (newData, oldData, resolve) => {
+    let disbursement_date = new Date(newData.disbursement_date)
+      .toISOString()
+      .slice(0, 10);
+
+    let errorList = [];
+    if (
+      newData.disbursement_date === "" ||
+      newData.disbursement_date === null
+    ) {
+      errorList.push("Disbursement date can't be empty   ");
+      setIserror(true);
+    }
+
+    if (errorList.length < 1) {
+      axios
+        .post(
+          `${URD}/disbursementDate/update/${oldData.disbursement_id}/${company}/${disbursement_date}`
+        )
+        .then((response) => {
+          setDisburses(response.data);
+          setAlertMessage(["Disbursement Date Updated Successfully  "]);
+          setIserror(false);
+          resolve();
+        })
+        .catch((error) => {
+          console.log(error);
+          setAlertMessage(["Oops, something went wrong!!!   "]);
+          setIserror(true);
+          resolve();
+        });
+    } else {
+      setAlertMessage(errorList);
+      setIserror(true);
+      resolve();
+    }
   };
 
   const columns = [
@@ -160,6 +199,12 @@ const Disbursement = () => {
                       isFreeAction: true,
                     },
                   ]}
+                  editable={{
+                    onRowUpdate: (newData, oldData) =>
+                      new Promise((resolve) => {
+                        handleRowUpdate(newData, oldData, resolve);
+                      }),
+                  }}
                 />
               ) : (
                 <CircularProgress />

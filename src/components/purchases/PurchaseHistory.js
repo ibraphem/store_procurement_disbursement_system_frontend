@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
@@ -102,7 +102,7 @@ const useStyles2 = makeStyles({
   },
 });
 
-const PurchaseHistory = ({ purchases }) => {
+const PurchaseHistory = ({ purchases, company }) => {
   const classes = useStyles2();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -134,13 +134,20 @@ const PurchaseHistory = ({ purchases }) => {
       >
         <TableHead>
           <TableRow>
-            <TableCell className={classes.tableHeadCell}>PURCHASE ID</TableCell>
+            {company === "Uniform" ? null : (
+              <TableCell className={classes.tableHeadCell}>
+                PURCHASE ID
+              </TableCell>
+            )}
+
             <TableCell className={classes.tableHeadCell} align="center">
               DATE
             </TableCell>
-            <TableCell className={classes.tableHeadCell} align="center">
-              SUPPLIER
-            </TableCell>
+            {company === "Uniform" ? null : (
+              <TableCell className={classes.tableHeadCell}>
+                SUPPLIER ID
+              </TableCell>
+            )}
             <TableCell className={classes.tableHeadCell} align="center">
               QUANTITY
             </TableCell>
@@ -161,21 +168,28 @@ const PurchaseHistory = ({ purchases }) => {
             : purchases
           ).map((purchase) => (
             <TableRow key={purchase.id}>
-              <TableCell component="th" scope="row">
-                PUR - {purchase.purchase_id}
-              </TableCell>
+              {company === "Uniform" ? null : (
+                <TableCell component="th" scope="row">
+                  PUR - {purchase.purchase_id}
+                </TableCell>
+              )}
+
               <TableCell align="center">
                 {formatDate(purchase.purchase_date)}
               </TableCell>
-              <TableCell align="center">
-                {purchase.supplier.supplier_name}
-              </TableCell>
+              {company === "Uniform" ? null : (
+                <TableCell align="center">
+                  {purchase.supplier.supplier_name}
+                </TableCell>
+              )}
+
               <TableCell align="center">{purchase.supply_qty}</TableCell>
               <TableCell align="center">
-                &#8358;{purchase.purchase_price}
+                &#8358;{Number(purchase.purchase_price).toFixed(2)}
               </TableCell>
               <TableCell align="center">
-                &#8358;{purchase.supply_qty * purchase.purchase_price}
+                &#8358;
+                {(purchase.supply_qty * purchase.purchase_price).toFixed(2)}
               </TableCell>
             </TableRow>
           ))}

@@ -20,6 +20,7 @@ import AddIcon from "@material-ui/icons/Add";
 import { useHistory } from "react-router-dom";
 import SuccessAlerts from "../layouts/alerts/SuccessAlerts";
 import ErrorAlerts from "../layouts/alerts/ErrorAlerts";
+import { URD } from "../layouts/Config";
 import { useParams } from "react-router-dom";
 import moment from "moment";
 import PurchaseItems from "./PurchaseItems";
@@ -64,7 +65,7 @@ const Purchase = () => {
   useEffect(() => {
     setIsLoading(true);
     axios
-      .get(`http://127.0.0.1:8000/api/procurement/${company}`)
+      .get(`${URD}/procurement/${company}`)
       .then((response) => {
         setPurchases(response.data);
         setIsLoading(false);
@@ -95,6 +96,12 @@ const Purchase = () => {
       editable: "never",
       render: (row) => <span>PUR - {row["purchase_id"]}</span>,
     },
+    {
+      title: "TOTAL SPENT",
+      field: "total",
+      editable: "never",
+      render: (row) => <span>&#8358;{row["total"]}</span>,
+    },
   ];
 
   const handleRowUpdate = (newData, oldData, resolve) => {
@@ -112,7 +119,7 @@ const Purchase = () => {
     if (errorList.length < 1) {
       axios
         .post(
-          `http://127.0.0.1:8000/api/procurementDate/update/${oldData.purchase_id}/${company}/${procurement_date}`
+          `${URD}/procurementDate/update/${oldData.purchase_id}/${company}/${procurement_date}`
         )
         .then((response) => {
           if (response.data === 59) {
@@ -204,6 +211,12 @@ const Purchase = () => {
                       isFreeAction: true,
                     },
                   ]}
+                  editable={{
+                    onRowUpdate: (newData, oldData) =>
+                      new Promise((resolve) => {
+                        handleRowUpdate(newData, oldData, resolve);
+                      }),
+                  }}
                 />
               ) : (
                 <CircularProgress />

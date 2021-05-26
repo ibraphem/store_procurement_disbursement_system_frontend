@@ -5,6 +5,7 @@ import axios from "axios";
 import PurchaseHistory from "../purchases/PurchaseHistory";
 import DisbursementHistory from "../disbursement/DisbursementHistory";
 import { Link } from "react-router-dom";
+import { URD } from "../layouts/Config";
 
 const StoreDetail = () => {
   let params = useParams();
@@ -22,7 +23,11 @@ const StoreDetail = () => {
 
   useEffect(() => {
     axios
-      .get(`http://127.0.0.1:8000/api/store/detail/${id}/${company}`)
+      .get(
+        `${URD}/${
+          company === "Uniform" ? "stores" : "store"
+        }/detail/${id}/${company}`
+      )
       .then((response) => {
         // console.log(response.data.purchase);
         setPurchaseDate(response.data.purchase_date);
@@ -58,7 +63,7 @@ const StoreDetail = () => {
               <div className="card card-primary card-outline">
                 <div className="card-body box-profile">
                   <h3 className="profile-username text-center">{item}</h3>
-                  <p class="text-muted text-center">{company}</p>
+                  <p className="text-muted text-center">{company}</p>
                   <ul className="list-group list-group-unbordered mb-3">
                     <li className="list-group-item">
                       <b>Last Purchase :</b>{" "}
@@ -78,10 +83,10 @@ const StoreDetail = () => {
                     </li>
                   </ul>
                   <Link
-                    to={`/form/Procurement/${company}`}
+                    to={`/item/report/${id}/${company}/${item}`}
                     className="btn btn-primary btn-block"
                   >
-                    <b>Make Purchase</b>
+                    <b>Fetch Report</b>
                   </Link>
                 </div>
                 {/* /.card-body */}
@@ -116,11 +121,14 @@ const StoreDetail = () => {
                 <div className="card-body">
                   <div className="tab-content">
                     <div className="active tab-pane" id="activity">
-                      <PurchaseHistory purchases={purchase} />
+                      <PurchaseHistory purchases={purchase} company={company} />
                     </div>
                     {/* /.tab-pane */}
                     <div className="tab-pane" id="timeline">
-                      <DisbursementHistory disburses={disburse} />
+                      <DisbursementHistory
+                        disburses={disburse}
+                        company={company}
+                      />
                     </div>
                   </div>
                   {/* /.tab-content */}

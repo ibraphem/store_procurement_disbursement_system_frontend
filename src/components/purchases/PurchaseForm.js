@@ -10,6 +10,7 @@ import PurchaseSearch from "./PurchaseSearch";
 import PurchaseSearchList from "./PurchaseSearchList";
 import PurchaseList from "./PurchaseList";
 import { useParams } from "react-router-dom";
+import { URD } from "../layouts/Config";
 
 const PurchaseForm = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +40,7 @@ const PurchaseForm = () => {
   useEffect(() => {
     setIsLoading(true);
     axios
-      .get("http://127.0.0.1:8000/api/item")
+      .get(`${URD}/item`)
       .then((response) => {
         setItems(response.data);
         setIsLoading(false);
@@ -79,7 +80,7 @@ const PurchaseForm = () => {
     dispatch,
   ] = useStateValue();
 
-  // console.log(disburseLo);
+  console.log(disburseLo);
 
   let filt = filtered?.map((v) => ({
     ...v,

@@ -5,7 +5,8 @@ import IconButton from "@material-ui/core/IconButton";
 import SearchIcon from "@material-ui/icons/Search";
 import CloseIcon from "@material-ui/icons/Close";
 
-const Search = ({ keyword, resetFilter, searchWord }) => {
+const Search = ({ keywords, resetFilter, searchWord }) => {
+  console.log(searchWord);
   return (
     <div style={{ float: "right", marginBottom: 10 }}>
       <TextField
@@ -13,7 +14,7 @@ const Search = ({ keyword, resetFilter, searchWord }) => {
         variant="outlined"
         value={searchWord}
         placeholder="Search..."
-        onChange={keyword}
+        onChange={keywords}
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">

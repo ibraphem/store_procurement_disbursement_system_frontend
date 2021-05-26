@@ -1,10 +1,12 @@
 import React from "react";
 import Button from "@material-ui/core/Button";
+import { CircularProgress } from "@material-ui/core";
 
-const CompletePurchase = ({ completed, action }) => {
+const CompletePurchase = ({ completed, action, isCompleting }) => {
   return (
     <Button
       variant="contained"
+      disabled={isCompleting ? true : false}
       style={{
         width: "100%",
         fontWeight: "bolder",
@@ -13,7 +15,11 @@ const CompletePurchase = ({ completed, action }) => {
       }}
       onClick={completed}
     >
-      Complete {action}
+      {isCompleting ? (
+        <CircularProgress style={{ color: "#fff" }} />
+      ) : (
+        `Complete ${action}`
+      )}
     </Button>
   );
 };
